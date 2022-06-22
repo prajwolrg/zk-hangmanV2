@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0
 pragma solidity ^0.8.0;
 
 import {InitVerifier} from "./InitVerifier.sol";
@@ -14,12 +15,13 @@ contract zkHangman {
     uint public secretHash;
     uint public correctGuesses;
     uint public turn;
+    uint public totalChars;
 
     bool public gameOver;
 
     uint[] public guesses;
-    uint[5] public characterHashes;
-    uint[5] public revealedChars;
+    uint[] public characterHashes;
+    uint[] public revealedChars;
 
     event NextTurn(uint nextTurn);
     
@@ -29,9 +31,6 @@ contract zkHangman {
         initVerifier = InitVerifier(_initVerifier);
         guessVerifier = GuessVerifier(_guessVerifier); 
 
-        for (uint i = 0; i < revealedChars.length; i++) {
-            revealedChars[i] = 99; // we'll use 99 to indicate that a char has not been revealed yet
-        }
     } 
 
     modifier gameNotOver() {
@@ -47,16 +46,20 @@ contract zkHangman {
             uint[2] memory _a,
             uint[2][2] memory _b,
             uint[2] memory _c,
-            uint[6] memory _input
+            uint[26] memory _input,
+            uint _totalChars
         ) external gameNotOver {
         require(msg.sender == host, "invalid caller");
         require(turn == 0, "invalid turn");
         require(initVerifier.verifyProof(_a, _b, _c, _input), "invalid proof");
+        require(_totalChars < _input.length, "total chars must be less");
 
         secretHash = _input[0];
+        totalChars = _totalChars;
 
-        for(uint i = 1; i < _input.length; i++) {
-            characterHashes[i-1] = _input[i];
+        for(uint i = 0; i < totalChars; i++) {
+            characterHashes.push(_input[i+1]);
+            revealedChars.push(99); // we'll use 99 to indicate that a char has not been revealed yet
         }
 
         turn++;
@@ -71,7 +74,7 @@ contract zkHangman {
         require(_guess >= 0 && _guess <= 25, "invalid guess");
 
         for (uint i = 0; i < guesses.length; i++) {
-            require(guesses[i] != _guess, "invalid guess");
+            require(guesses[i] != _guess, "already guessed");
         }
 
         guesses.push(_guess);
@@ -121,3 +124,4 @@ contract zkHangman {
         emit NextTurn(turn);
     }
 }
+

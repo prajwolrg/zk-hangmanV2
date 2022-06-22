@@ -5,7 +5,7 @@ improvements section below for ways in which this project could be made better.
 # zk-hangman
 Circuits and contracts for zk-hangman.
 
-An implementation of a frontend can be found here: <https://github.com/russel-ra/zk-hangman-frontend>
+An implementation of a frontend can be found here: <https://github.com/prajwolrg/zk-hangmanV2-frontend>
 
 ## Brief overview
 
