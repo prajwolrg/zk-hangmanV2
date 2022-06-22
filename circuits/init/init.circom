@@ -55,4 +55,3 @@ template init(n) {
 }
 
 component main = init(25);
-
