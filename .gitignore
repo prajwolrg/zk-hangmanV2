@@ -8,8 +8,8 @@ package-lock.json
 circuits/init/*
 !/circuits/init/init.circom
 
-circuits/guess
-!circuits/guess/guess.circom
+circuits/guess/*
+!circuits/guess/guess.circom 
 zk-hangman/circuits/powersOfTau28_hez_final_17.ptau
 
 public/
