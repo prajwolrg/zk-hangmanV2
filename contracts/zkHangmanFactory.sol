@@ -1,17 +1,47 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity ^0.8.0;
 
-import './zkHangman.sol';
+import "./zkHangman.sol";
 
 contract zkHangmanFactory {
     address[] public games;
 
-    event GameCreated(address indexed host, address indexed player, address gameAddress, address initVerifier, address guessVerifier);
+    event GameCreated(
+        address indexed host,
+        address indexed player,
+        address gameAddress,
+        address initVerifier,
+        address guessVerifier
+    );
 
-    function createGame(address _host, address _player, address _initVerifier, address _guessVerifier) public {
-        zkHangman _game = new zkHangman(_host, _player, _initVerifier, _guessVerifier);
+    function createGame(
+        address _player,
+        address _initVerifier,
+        address _guessVerifier,
+        uint256[2] memory _a,
+        uint256[2][2] memory _b,
+        uint256[2] memory _c,
+        uint256[26] memory _input,
+        uint256 _totalChars
+    ) public {
+        zkHangman _game = new zkHangman(
+            _player,
+            _initVerifier,
+            _guessVerifier,
+            _a,
+            _b,
+            _c,
+            _input,
+            _totalChars
+        );
         games.push(address(_game));
-        
-        emit GameCreated(_host, _player, address(_game), _initVerifier, _guessVerifier);
+
+        emit GameCreated(
+            msg.sender,
+            _player,
+            address(_game),
+            _initVerifier,
+            _guessVerifier
+        );
     }
 }
