@@ -1,0 +1,3 @@
+[submodule "zk-hangman-frontend"]
+	path = zk-hangman-frontend
+	url = https://github.com/prajwolrg/zk-hangmanV2-frontend

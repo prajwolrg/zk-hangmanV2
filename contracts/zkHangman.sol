@@ -36,7 +36,6 @@ contract zkHangman {
         uint256[26] memory _input,
         uint256 _totalChars
     ) private gameNotOver {
-        require(msg.sender == host, "invalid caller");
         require(turn == 0, "invalid turn");
         require(initVerifier.verifyProof(_a, _b, _c, _input), "invalid proof");
         require(_totalChars < _input.length, "total chars must be less");
@@ -64,7 +63,7 @@ contract zkHangman {
         uint256[26] memory _input,
         uint256 _totalChars
     ) {
-        host = msg.sender;
+        host = tx.origin;
         player = _player;
         initVerifier = InitVerifier(_initVerifier);
         guessVerifier = GuessVerifier(_guessVerifier);
