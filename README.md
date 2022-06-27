@@ -5,7 +5,7 @@ An implementation of a frontend can be found here: <https://github.com/prajwolrg
 
 ## Overview
 This is the implementation of the classic Hangman game with the use of smart contracts and 
-zero knowledge proofs. It improves upon the work [here](https://github.com/prajwolrg/zk-hangmanV2.git).
+zero knowledge proofs. It improves upon the work [here](https://github.com/russel-ra/zk-hangman).
 
 ## Table of Contents
 
