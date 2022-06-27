@@ -88,9 +88,18 @@ source .scripts/compile_circuits.sh
 ```
 
 ### Run contracts
+//TODO: Automate this with script
+Update the solidity version and the contract name.
+InitVerifier: contract Verifier -> contract InitVerifier
+GuessVerifier: contract Verifier -> contract GuessVerifier
+Also bump the solidity versions on both contracts to ^0.8.0
 
-To compile and deploy the contracts, we'll utilize to the appropriate chain.
+Before deploying the contracts, create a `.env` file and add to it:
+```bash
+MNEMONIC=<YOUR_MNEMONIC>
+```
 
+Now deploy to the appropriate network
 ```bash
 npx hardhat run --network devnet scripts/deploy.js
 ```
