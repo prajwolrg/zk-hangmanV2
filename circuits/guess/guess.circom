@@ -1,33 +1,13 @@
 pragma circom 2.0.0;
 
 include "../circomlib/mimcsponge.circom";
-include "../circomlib/comparators.circom";
 
-template init(n) {
+template guess() {
+    signal input char;
     signal input secret;
-    signal input char[n];
 
     signal output secretHash;
-    signal output charHash[n];
-
-    component leqt[n];
-    component geqt[n];
-
-    // characters are represented as digits between 0-25 inclusive
-
-    for (var i = 0; i < n; i++) {
-        leqt[i] = LessEqThan(5);
-        leqt[i].in[0] <== char[i];
-        leqt[i].in[1] <== 25; 
-
-        leqt[i].out === 1;
-
-        geqt[i] = GreaterEqThan(5);
-        geqt[i].in[0] <== char[i];
-        geqt[i].in[1] <== 0; 
-
-        geqt[i].out === 1;
-    }
+    signal output charHash;
 
     // calculate secret hash
 
@@ -38,20 +18,17 @@ template init(n) {
 
     secretHash <== mimcSecret.outs[0];
 
-    // calculate character hashes
+    // calculate character hash which is hash(char, secret)
 
-    component charMimc[n];
+    component mimcChar = MiMCSponge(2, 220, 1);
+    
+    mimcChar.ins[0] <== char;
+    mimcChar.ins[1] <== secret;
+    mimcChar.k <== 0;
 
-    for (var i = 0; i < n; i++) {
-        charMimc[i] = MiMCSponge(2, 220, 1);
-
-        charMimc[i].ins[0] <== char[i];
-        charMimc[i].ins[1] <== secret;
-        charMimc[i].k <== 0;
-        
-        charHash[i] <== charMimc[i].outs[0];
-    }
+    charHash <== mimcChar.outs[0];
 
 }
 
-component main = init(25);
+component main {public [char] } = guess();
+
