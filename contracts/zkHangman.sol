@@ -132,4 +132,22 @@ contract zkHangman {
 
         emit NextTurn(turn);
     }
+
+    function getGameStatus() public view returns (
+        bool _gameOver,
+        uint256 _correctGuesses, 
+        uint256 _turn,
+        uint256 _totalChars,
+        uint256[] memory _guesses,
+        uint256[] memory _characterHashes,
+        uint256[] memory _revealedChars
+    ) {
+        _gameOver = gameOver;
+        _correctGuesses = correctGuesses;
+        _turn = turn;
+        _totalChars = totalChars;
+        _guesses = guesses;
+        _characterHashes = characterHashes;
+        _revealedChars = revealedChars;
+    }
 }
