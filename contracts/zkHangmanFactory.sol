@@ -8,14 +8,13 @@ contract zkHangmanFactory {
 
     event GameCreated(
         address indexed host,
-        address indexed player,
         address gameAddress,
         address initVerifier,
-        address guessVerifier
+        address guessVerifier,
+        uint256 totalChars
     );
 
     function createGame(
-        address _player,
         address _initVerifier,
         address _guessVerifier,
         uint256[2] memory _a,
@@ -25,7 +24,6 @@ contract zkHangmanFactory {
         uint256 _totalChars
     ) public {
         zkHangman _game = new zkHangman(
-            _player,
             _initVerifier,
             _guessVerifier,
             _a,
@@ -38,10 +36,10 @@ contract zkHangmanFactory {
 
         emit GameCreated(
             msg.sender,
-            _player,
             address(_game),
             _initVerifier,
-            _guessVerifier
+            _guessVerifier,
+            _totalChars
         );
     }
 }

@@ -54,7 +54,6 @@ contract zkHangman {
     }
 
     constructor(
-        address _player,
         address _initVerifier,
         address _guessVerifier,
         uint256[2] memory _a,
@@ -64,7 +63,6 @@ contract zkHangman {
         uint256 _totalChars
     ) {
         host = tx.origin;
-        player = _player;
         initVerifier = InitVerifier(_initVerifier);
         guessVerifier = GuessVerifier(_guessVerifier);
 
@@ -74,6 +72,12 @@ contract zkHangman {
     modifier gameNotOver() {
         require(!gameOver, "the game is over");
         _;
+    }
+
+    function joinGame() public {
+        require(msg.sender != host, "invalid player");
+        require(player == address(0), "someone has already joined the game");
+        player = msg.sender;
     }
 
     function playerGuess(uint256 _guess) external gameNotOver {
