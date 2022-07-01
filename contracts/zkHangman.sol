@@ -133,7 +133,10 @@ contract zkHangman {
         emit NextTurn(turn);
     }
 
-    function getGameStatus() public view returns (
+    function getGameInfo() public view returns (
+        address _host,
+        address _player,
+        uint256 _playerLives,
         bool _gameOver,
         uint256 _correctGuesses, 
         uint256 _turn,
@@ -142,6 +145,9 @@ contract zkHangman {
         uint256[] memory _characterHashes,
         uint256[] memory _revealedChars
     ) {
+        _host = host;
+        _player = player;
+        _playerLives = playerLives;
         _gameOver = gameOver;
         _correctGuesses = correctGuesses;
         _turn = turn;
