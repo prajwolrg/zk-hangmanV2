@@ -104,11 +104,11 @@ contract zkHangman {
         uint256[2] memory _a,
         uint256[2][2] memory _b,
         uint256[2] memory _c,
-        uint256[3] memory _input
+        uint256[27] memory _input
     ) external gameNotOver {
         require(msg.sender == host, "invalid caller");
         require(turn != 0 && turn % 2 == 0, "invalid turn");
-        require(_input[2] == guesses[guesses.length - 1], "invalid character");
+        require(_input[26] == guesses[guesses.length - 1], "invalid character");
         require(_input[0] == secretHash, "invalid secret");
         require(guessVerifier.verifyProof(_a, _b, _c, _input), "invalid proof");
 
@@ -116,8 +116,8 @@ contract zkHangman {
         bool incorrectGuess = true;
 
         for (uint256 i = 0; i < characterHashes.length; i++) {
-            if (_input[1] == characterHashes[i]) {
-                revealedChars[i] = _input[2];
+            if (_input[1+i] == characterHashes[i]) {
+                revealedChars[i] = _input[26];
                 incorrectGuess = false;
                 correctGuesses++; // this is fine since the player cannot guess the same character twice
             }

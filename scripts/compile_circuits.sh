@@ -8,27 +8,7 @@ else
     wget https://hermez.s3-eu-west-1.amazonaws.com/powersOfTau28_hez_final_17.ptau
 fi
 
-cd guess
-
-echo "Compiling guess.circom..."
-
-# compile guess.circom and copy needed files to public
-circom guess.circom --r1cs --wasm --sym -o .
-snarkjs r1cs info guess.r1cs
-cp guess_js/guess.wasm ../../public/
-
-# Start a new zkey and make a contribution
-snarkjs groth16 setup guess.r1cs ../powersOfTau28_hez_final_17.ptau guess_0000.zkey
-snarkjs zkey contribute guess_0000.zkey guess_0001.zkey --name="PG" -v -e="random text"
-snarkjs zkey export verificationkey guess_0001.zkey guess_verification_key.json
-cp guess_0001.zkey ../../public/
-cp guess_verification_key.json ../../public/
-
-# generate solidity contract
-snarkjs zkey export solidityverifier guess_0001.zkey ../../contracts/GuessVerifier.sol
-
-
-cd ../init
+cd init
 
 echo "Compiling init.circom..."
 
@@ -48,4 +28,26 @@ cp init_verification_key.json ../../public/
 # generate solidity contract
 snarkjs zkey export solidityverifier init_0001.zkey ../../contracts/InitVerifier.sol
 
+cd ../guess
+
+echo "Compiling guess.circom..."
+
+# compile guess.circom and copy needed files to public
+circom guess.circom --r1cs --wasm --sym -o .
+snarkjs r1cs info guess.r1cs
+cp guess_js/guess.wasm ../../public/
+
+# Start a new zkey and make a contribution
+snarkjs groth16 setup guess.r1cs ../powersOfTau28_hez_final_17.ptau guess_0000.zkey
+snarkjs zkey contribute guess_0000.zkey guess_0001.zkey --name="PG" -v -e="random text"
+snarkjs zkey export verificationkey guess_0001.zkey guess_verification_key.json
+cp guess_0001.zkey ../../public/
+cp guess_verification_key.json ../../public/
+
+# generate solidity contract
+snarkjs zkey export solidityverifier guess_0001.zkey ../../contracts/GuessVerifier.sol
+
 cd ../..
+
+# adjust solidity contracts
+node scripts/adjust_solidity.js

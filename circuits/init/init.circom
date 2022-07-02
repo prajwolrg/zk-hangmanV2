@@ -43,10 +43,11 @@ template init(n) {
     component charMimc[n];
 
     for (var i = 0; i < n; i++) {
-        charMimc[i] = MiMCSponge(2, 220, 1);
+        charMimc[i] = MiMCSponge(3, 220, 1);
 
         charMimc[i].ins[0] <== char[i];
         charMimc[i].ins[1] <== secret;
+        charMimc[i].ins[2] <== i;
         charMimc[i].k <== 0;
         
         charHash[i] <== charMimc[i].outs[0];
