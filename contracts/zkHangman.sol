@@ -43,7 +43,7 @@ contract zkHangman {
         secretHash = _input[0];
 
         for (uint256 i = 0; i < totalChars; i++) {
-            characterHashes.push(_input[i + 1]);
+            characterHashes.push(_input[i + 2]);
             revealedChars.push(0); // we'll use 0 to indicate that a char has not been revealed yet
         }
 
@@ -82,7 +82,7 @@ contract zkHangman {
         require(playerLives > 0);
         require(msg.sender == player, "invalid caller");
         require(turn % 2 == 1, "invalid turn");
-        require(_guess >= 0 && _guess <= 25, "invalid guess");
+        require(_guess >= 1 && _guess <= 26, "invalid guess");
 
         for (uint256 i = 0; i < guesses.length; i++) {
             require(guesses[i] != _guess, "already guessed");
