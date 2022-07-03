@@ -76,6 +76,7 @@ template init(n) {
     component charMimc[n];
     component muxChar[n];
     component muxLength[n];
+    component muxZero[n];
 
     var length = 0;
     for (var i = 0; i < n; i++) {
@@ -84,15 +85,19 @@ template init(n) {
         charMimc[i] = MiMCSponge(3, 220, 1);
         muxChar[i] = Mux1();
         muxLength[i] = Mux1();
+        muxZero[i] = Mux1();
 
 		// Check if the char is 0 (null)
         isZero[i].in <== char[i];
 
 		// If null character is previously encountered, the word has already ended
         // and there can be no valid character later
-        if (endOfWordFlag == 1) {
-            isZero[i].out === 1;
-        }
+        muxZero[i].c[0] <== 0;
+        muxZero[i].c[1] <== isZero[i].out;
+        muxZero[i].s <== endOfWordFlag;
+
+        muxZero[i].out === endOfWordFlag;
+
         endOfWordFlag = isZero[i].out;
 
         // Calculate hash of each character

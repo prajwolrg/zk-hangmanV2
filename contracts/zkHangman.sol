@@ -33,7 +33,7 @@ contract zkHangman {
         uint256[2] memory _a,
         uint256[2][2] memory _b,
         uint256[2] memory _c,
-        uint256[26] memory _input,
+        uint256[27] memory _input,
         uint256 _totalChars
     ) private gameNotOver {
         require(turn == 0, "invalid turn");
@@ -59,7 +59,7 @@ contract zkHangman {
         uint256[2] memory _a,
         uint256[2][2] memory _b,
         uint256[2] memory _c,
-        uint256[26] memory _input,
+        uint256[27] memory _input,
         uint256 _totalChars
     ) {
         host = tx.origin;
