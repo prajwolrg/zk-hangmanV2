@@ -4,6 +4,18 @@ pragma solidity ^0.8.0;
 import {InitVerifier} from "./InitVerifier.sol";
 import "./GuessVerifier.sol";
 
+// @title Implementation of Hangman Game Utilizing Zero Knowledge
+// @notice This contract is deployed from zkHangmanFactory contract
+
+// Alphabets of the word as represented as numbers as:
+// A -> 1
+// B -> 2
+// C -> 3
+// ...
+// Z -> 26
+
+// Unknown/unrevealed alphabets are represented by using the number 0.
+
 contract zkHangman {
     InitVerifier public initVerifier;
     GuessVerifier public guessVerifier;
@@ -11,11 +23,13 @@ contract zkHangman {
     address public host;
     address public player;
 
+    uint256 public totalChars;
     uint256 public playerLives = 6;
     uint256 public secretHash;
     uint256 public correctGuesses;
+
+    // turn is used to track if the move can be made by host/player
     uint256 public turn;
-    uint256 public totalChars;
 
     bool public gameOver;
 
@@ -25,26 +39,47 @@ contract zkHangman {
 
     event NextTurn(uint256 nextTurn);
 
-    // verify init proof and set up contract state
+
+    // @notice Initializes the game after verifying the proof
+    // _input is the public outputs from the init circuit.
     // input[0] contains the hash of the secret
-    // input[1..] contains the hashes of the characters
-    // the host has to choose a word with a length of 5
+    // input[1] contains the total characters in the word
+    // input[2...26] contains the hashes of the characters
+
+    // if 0 < wordLengh < 25, the additional hashes is 0 and is not required to be processed
+
+    // the host can choose a word of any length < 25
+    // 25 is chosen arbitrarily and the word limit can be set from the circuits.
+
     function initializeGame(
         uint256[2] memory _a,
         uint256[2][2] memory _b,
         uint256[2] memory _c,
         uint256[27] memory _input
     ) private gameNotOver {
+
+        // Game can only initialized if none has played yet.
         require(turn == 0, "invalid turn");
+
+		// Verify the circuit proof
         require(initVerifier.verifyProof(_a, _b, _c, _input), "invalid proof");
+
+        // Total characters in the word is given in _input[1]
         totalChars = _input[1];
+
+        // Total characters in the word must be less than the input length
+        // This check can be omitted since the totalChars is set from the output of the circuit
+        // and thus the relation is always true.
         require(totalChars < _input.length, "total chars must be less");
 
+		// Save the secret hash to verify later that the same secret is being used to process guess
         secretHash = _input[0];
 
+		// Save the character hashes of the alphabets
+		// Set none of the characters are revealed.
         for (uint256 i = 0; i < totalChars; i++) {
             characterHashes.push(_input[i + 2]);
-            revealedChars.push(0); // we'll use 0 to indicate that a char has not been revealed yet
+            revealedChars.push(0); 
         }
 
         turn++;
@@ -52,6 +87,7 @@ contract zkHangman {
         emit NextTurn(turn);
     }
 
+    // @notice Creates the game
     constructor(
         address _initVerifier,
         address _guessVerifier,
@@ -72,21 +108,38 @@ contract zkHangman {
         _;
     }
 
+	// @notice Allow player to join the game
     function joinGame() public {
+
+        // Host cannot join themselves as the player
         require(msg.sender != host, "invalid player");
+
+        // Only one player can join the game
         require(player == address(0), "someone has already joined the game");
+
+        // Set the player address
         player = msg.sender;
     }
 
+    // @notice Makes a guess.
+    // @param _guess Must be an alphabet [A..Z] represented as number
     function playerGuess(uint256 _guess) external gameNotOver {
+
+        // Only player can make a guess
         require(msg.sender == player, "invalid caller");
+
+        // Player can make guess only in their turn
         require(turn % 2 == 1, "invalid turn");
+
+        // Guess must be a valid representation of character
         require(_guess >= 1 && _guess <= 26, "invalid guess");
 
+		// Check if the alphabet has already been guesses.
         for (uint256 i = 0; i < guesses.length; i++) {
             require(guesses[i] != _guess, "already guessed");
         }
 
+        // Add guessed alphabet to the list of guesses
         guesses.push(_guess);
 
         turn++;
@@ -94,24 +147,35 @@ contract zkHangman {
         emit NextTurn(turn);
     }
 
+    // @notice Process the player's guess
+
     // input[0] contains the hash of the secret
-    // input[1] contains the hash of the character and the secret
-    // input[2] contains the character represented as an uint within the range 0-25
+    // input[1..26] contains the hash(char, secret, index)
+    // input[27] contains the character represented in the range 1-26
     function processGuess(
         uint256[2] memory _a,
         uint256[2][2] memory _b,
         uint256[2] memory _c,
         uint256[27] memory _input
     ) external gameNotOver {
+
+        // Only host can process the guess
         require(msg.sender == host, "invalid caller");
+
+        // Host can process the guess in his turn
         require(turn != 0 && turn % 2 == 0, "invalid turn");
+
+        // Ensure that the host has processed the guess made by player
         require(_input[26] == guesses[guesses.length - 1], "invalid character");
+
+        // Ensure that the host has used same secret as used in the initialization
         require(_input[0] == secretHash, "invalid secret");
+
+        // Verify proof
         require(guessVerifier.verifyProof(_a, _b, _c, _input), "invalid proof");
 
-        // check if player has made an incorrect guess
+        // Check if the player made right/wrong guess
         bool incorrectGuess = true;
-
         for (uint256 i = 0; i < characterHashes.length; i++) {
             if (_input[1+i] == characterHashes[i]) {
                 revealedChars[i] = _input[26];
@@ -120,11 +184,12 @@ contract zkHangman {
             }
         }
 
+		// If wrong guess, decrease the life of player
         if (incorrectGuess) {
             playerLives -= 1;
         }
 
-        // check if game is over
+        // Check if the game is over
         if (correctGuesses == characterHashes.length || playerLives == 0) {
             gameOver = true;
         }
@@ -134,6 +199,7 @@ contract zkHangman {
         emit NextTurn(turn);
     }
 
+    // @notice Returns the information about the game
     function getGameInfo() public view returns (
         address _host,
         address _player,

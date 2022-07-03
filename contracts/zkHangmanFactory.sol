@@ -14,6 +14,12 @@ contract zkHangmanFactory {
         uint256 totalChars
     );
 
+    // @notice Creates the game
+    // _input is the public outputs from the init circuit.
+    // input[0] contains the hash of the secret
+    // input[1] contains the total characters in the word
+    // input[2...26] contains the hashes of the characters
+
     function createGame(
         address _initVerifier,
         address _guessVerifier,
