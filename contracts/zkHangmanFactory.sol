@@ -20,8 +20,7 @@ contract zkHangmanFactory {
         uint256[2] memory _a,
         uint256[2][2] memory _b,
         uint256[2] memory _c,
-        uint256[27] memory _input,
-        uint256 _totalChars
+        uint256[27] memory _input
     ) public {
         zkHangman _game = new zkHangman(
             _initVerifier,
@@ -29,8 +28,7 @@ contract zkHangmanFactory {
             _a,
             _b,
             _c,
-            _input,
-            _totalChars
+            _input
         );
         games.push(address(_game));
 
@@ -39,7 +37,7 @@ contract zkHangmanFactory {
             address(_game),
             _initVerifier,
             _guessVerifier,
-            _totalChars
+            _input[1]
         );
     }
 }

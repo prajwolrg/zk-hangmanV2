@@ -33,19 +33,18 @@ contract zkHangman {
         uint256[2] memory _a,
         uint256[2][2] memory _b,
         uint256[2] memory _c,
-        uint256[27] memory _input,
-        uint256 _totalChars
+        uint256[27] memory _input
     ) private gameNotOver {
         require(turn == 0, "invalid turn");
         require(initVerifier.verifyProof(_a, _b, _c, _input), "invalid proof");
-        require(_totalChars < _input.length, "total chars must be less");
+        totalChars = _input[1];
+        require(totalChars < _input.length, "total chars must be less");
 
         secretHash = _input[0];
-        totalChars = _totalChars;
 
         for (uint256 i = 0; i < totalChars; i++) {
             characterHashes.push(_input[i + 1]);
-            revealedChars.push(99); // we'll use 99 to indicate that a char has not been revealed yet
+            revealedChars.push(0); // we'll use 0 to indicate that a char has not been revealed yet
         }
 
         turn++;
@@ -59,14 +58,13 @@ contract zkHangman {
         uint256[2] memory _a,
         uint256[2][2] memory _b,
         uint256[2] memory _c,
-        uint256[27] memory _input,
-        uint256 _totalChars
+        uint256[27] memory _input
     ) {
         host = tx.origin;
         initVerifier = InitVerifier(_initVerifier);
         guessVerifier = GuessVerifier(_guessVerifier);
 
-        initializeGame(_a, _b, _c, _input, _totalChars);
+        initializeGame(_a, _b, _c, _input);
     }
 
     modifier gameNotOver() {
