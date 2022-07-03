@@ -79,7 +79,6 @@ contract zkHangman {
     }
 
     function playerGuess(uint256 _guess) external gameNotOver {
-        require(playerLives > 0);
         require(msg.sender == player, "invalid caller");
         require(turn % 2 == 1, "invalid turn");
         require(_guess >= 1 && _guess <= 26, "invalid guess");
@@ -126,7 +125,7 @@ contract zkHangman {
         }
 
         // check if game is over
-        if (correctGuesses == characterHashes.length) {
+        if (correctGuesses == characterHashes.length || playerLives == 0) {
             gameOver = true;
         }
 
