@@ -39,6 +39,13 @@ contract zkHangman {
 
     event NextTurn(uint256 nextTurn);
 
+    struct ProcessGuessParam {
+        uint256[2] _a;
+        uint256[2][2] _b;
+        uint256[2] _c;
+        uint256[27] _input;
+    }
+
 
     // @notice Initializes the game after verifying the proof
     // _input is the public outputs from the init circuit.
@@ -196,6 +203,26 @@ contract zkHangman {
 
         turn++;
 
+        emit NextTurn(turn);
+    }
+
+	// @notice Reveals the unguessed alphabets by the host
+	// @notice Similar to the processGuess function
+    function reveal(ProcessGuessParam[] memory params) external {
+        require(gameOver, "game must be over");
+        require(msg.sender == host, "invalid caller");
+
+        for (uint256 i=0; i<params.length; i++) {
+            require(params[i]._input[0] == secretHash, "invalid secret");
+            require(guessVerifier.verifyProof(params[i]._a, params[i]._b, params[i]._c, params[i]._input), "invalid proof");
+
+            for (uint256 j = 0; j < characterHashes.length; j++) {
+                if (params[i]._input[1+j] == characterHashes[j]) {
+                    revealedChars[j] = params[i]._input[26];
+                }
+            }
+        }
+        turn ++;
         emit NextTurn(turn);
     }
 
