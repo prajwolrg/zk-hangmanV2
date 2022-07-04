@@ -75,12 +75,12 @@ module.exports = {
 			network_id: '*',
 			accounts: ACCOUNTS
 		},
-		harmony: {
-			url: `https://api.s0.b.hmny.io`,
+		harmony_devnet: {
+			url: `https://api.s0.ps.hmny.io/`,
 			accounts: ACCOUNTS
 		},
-		devnet: {
-			url: `https://api.s0.ps.hmny.io/`,
+		harmony_mainnet: {
+			url: `https://api.harmony.one`,
 			accounts: ACCOUNTS
 		}
 
